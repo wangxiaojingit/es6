@@ -38,3 +38,25 @@ function sum (a=1,b=2){
   
   //啥叫闭包?当一个函数的返回值是一个引用数据类型,并且被外界变量接收,形成不销毁的作用域叫闭包 
   //23分钟
+
+  //箭头函数中没有this,this 指的是上一级作用域中的this.箭头函数没有arguments ----------
+  let obj={
+    a:1,
+    fn:()=>{ //对象不是作用域
+      setTimeout(()=>{
+        console.log(this)
+      })
+    }
+  }
+  obj.fn()
+  //箭头函数中没有arguments
+  let fn=()=>{
+    console.log(arguments)
+  }
+  fn(1,2,3) //Uncaught ReferenceError: arguments is not defined
+  //虽然箭头函数中没有arguments,但是我们通常需要用到,这个时候我们可以像下面那样用,用剩余参数
+  let fn=(...arguments)=>{
+     console.log(arguments) //[ 1, 2, 3 ]
+  }
+  fn(1,2,3)
+
