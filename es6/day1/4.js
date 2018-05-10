@@ -65,4 +65,21 @@ console.log(num)
 let num2=2;
 num2=num2.toString().padEnd(2,0);
 console.log(num2)
-
+//对象的深拷贝和浅拷贝
+//对于是值类型的,我们用下面的对象展开运算符进行拼接,发现修改obj3的属性值的时候,obj1的没有改变,
+//但是如果是引用数据类型呢?我们再做一下测试
+let obj1={"name":"lili"};
+let obj2={"age":12};
+let obj3={...obj1,...obj2}
+console.log(obj3)
+obj3.name="dv";
+console.log(obj3);
+console.log(obj1.name);
+//对于属性值是引用数据类型的展开运算符拼接
+let obj1={"hobbys":{name:["爬山","唱歌"]}};
+let obj2={"age":12};
+let obj3={...obj1,...obj2};
+console.log(obj3)
+obj3.hobbys.name="lili";
+console.log(obj3);//{ hobbys: { name: 'lili' }, age: 12 }
+console.log(obj1) //{ hobbys: { name: 'lili' } }
