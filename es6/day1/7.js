@@ -96,14 +96,16 @@
 Array.prototype.myReduce=function(fn,pre){
   for(var i=0;i<this.length;i++){
       if(typeof pre=="undefined"){
-         fn(this[i],this[i+1],i+1,this)
+        pre= fn(this[i],this[i+1],i+1,this)
       }else{
-         fn(pre,this[i],i,this)
+        pre= fn(pre,this[i],i,this)
       }
   }
+  return pre
 }
 
 let ary=[{"price":1,"count":1},{"price":2,"count":2}];
-ary.myReduce((pre,next,index,item)=>{
+let c=ary.myReduce((pre,next,index,item)=>{
    return pre+next.price*next.count;
 },0)
+console.log(c)

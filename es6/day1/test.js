@@ -9,10 +9,9 @@ Array.prototype.myReduce=function(fn,prev){
         }
     }
     return prev;
-   
 }
 
-let ary=[{"price":1,"count":1},{"price":2,"count":1}]
-ary.myReduce(function(pre,next,index,item){
+let ary=[{"price":1,"count":1},{"price":2,"count":1}];
+let c=ary.myReduce(function(pre,next,index,item){
    return pre+next.price*next.count;
 },0)

@@ -40,7 +40,6 @@ Parent.prototype.smock=function(){
 function Child(){
 
 }
-
 Child.prototype=new Parent();
 let child=new Child();
 console.log(child.name);
