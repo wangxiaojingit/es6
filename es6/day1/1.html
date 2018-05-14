@@ -42,3 +42,22 @@
     <div class="main">剩余时间</div>
 </body>
 </html>
+<script>
+    Array.prototype.myReduce=function(fn,prev){
+        debugger;
+    for(var i=0;i<this.length;i++){
+        if(typeof prev=="undefined"){
+           prev= fn(this[i],this[i+1],index,this)
+        }else{
+           prev= fn(prev,this[i],i,this)
+        }
+    }
+    return prev;
+}
+
+let ary=[{"price":1,"count":1},{"price":2,"count":1}];
+let c=ary.myReduce(function(pre,next,index,item){
+   return pre+next.price*next.count;
+},0)
+console.log(c)
+</script>

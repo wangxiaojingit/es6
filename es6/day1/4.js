@@ -75,11 +75,27 @@ console.log(obj3)
 obj3.name="dv";
 console.log(obj3);
 console.log(obj1.name);
-//对于属性值是引用数据类型的展开运算符拼接
+//对于属性值是引用数据类型的展开运算符拼接,
 let obj1={"hobbys":{name:["爬山","唱歌"]}};
 let obj2={"age":12};
 let obj3={...obj1,...obj2};
 console.log(obj3)
 obj3.hobbys.name="lili";
 console.log(obj3);//{ hobbys: { name: 'lili' }, age: 12 }
-console.log(obj1) //{ hobbys: { name: 'lili' } }
+console.log(obj1) //{ hobbys: { name: 'lili' } }  //发现修改obj3里面的引用数据值,obj1也改变了 这就是浅拷贝
+//对于上面的案例,我们如何实现深拷贝呢?
+let obj1={"hobbys":{name:["爬山","唱歌"]},"loves":["aa"]};
+let obj2={"age":12};
+let obj3={...obj1,hobbys:{...obj1.hobbys},...obj2};
+
+console.log(obj3);
+obj3.hobbys.name="lili";
+console.log(obj3);console.log(obj1);
+//上面的写法就可以达到深拷贝,就不会影响之前的数据,那么我们趁热打铁,再来练一个
+let obj1={frend:{"name":"daver"},study:{"name":"js"}};
+let obj2={"age":22};
+let obj3={...obj1,frend:{...obj1.frend},...obj2}
+obj3.frend.name="lili";
+console.log(obj3);
+console.log(obj1);
+//深
