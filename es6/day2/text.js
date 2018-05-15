@@ -35,3 +35,19 @@ ary.forEach(item=>{
 })
 console.log(obj.isString("123"))
 console.log(obj.isArray([1,2,3]))
+
+//练习判断类
+let ary=["Number","String","Boolean","Function","Null","Undefined","Object","Array"];
+let obj={};
+ary.forEach(function(item){
+  obj["is"+item]=isType(item)
+})
+function isType(type){
+   return function(item){
+     let typeBack= Object.prototype.toString.call(item).replace(/\[object\s|\]/g,"");
+     console.log(typeBack);
+     return typeBack==type;
+   }
+}
+
+console.log(obj.isArray([1,2,3]))

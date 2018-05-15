@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  
+</body>
+</html>
+<script>
+
+function MyPromise(callback){
+  let self=this;
+  self.status="pending";
+  self.resolveValue=undefined;
+  self.rejectValue=undefined;
+  self.successFnArray=[];//then 中成功状态执行的函数数组
+  self.errFnArray=[];//then 中失败状态执行的函数数组
+  function resolve(resolveValue){
+      if(self.status=="pending"){
+          self.status="resolve";
+          self.resolveValue=resolveValue;
+          self.successFnArray.forEach(function(item){
+           item()
+          })
+      }
+      
+  }
+  function reject(){
+    if(self.status=="pending"){
+          self.status="reject";
+          self.rejectValue=rejectValue;
+          self.errFnArray.forEach(function(item){
+           item()
+          })
+    }
+   
+  }
+ callback(resolve,reject)
+
+
+}
+MyPromise.prototype.then=function(success,err){
+  let self=this;
+  if(self.status=="resolve"){
+    success(self.resolveValue)
+  }else if(self.status=="reject"){
+    err(self.rejectValue)
+  }else if(self.status=="pending"){
+    self.successFnArray.push(function(){
+      success(self.resolveValue)
+    });
+    self.errFnArray.push(function(){
+      err(self.rejectValue)
+    });
+  }
+}
+let f1=new MyPromise(function(resolve,reject){
+    window.setTimeout(function(){ //如果此处出现异步,self.status还是"pending",跳过此处开始走then函数,
+      resolve(100)                //把then 函数里面的执行函数存放起来,当异步调用resolve(100)这个函数的时候,
+                                  //再把存放的then 执行数组一一执行
+    },1000)
+    
+});
+f1.then(function(data){
+    console.log(data)
+},function(err){
+    console.log(err)
+});
+f1.then(function(data){
+    console.log(data)
+},function(err){
+    console.log(err)
+})
+
+
+</script>
