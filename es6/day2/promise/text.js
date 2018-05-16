@@ -1,6 +1,12 @@
-let p1=new Promise(function(resolve,reject){
-   resolve(123)
+var p=new Promise(function(resolve,reject){
+      return  new Promise(function(resolve,reject){
+           resolve(100)
+      })
+}).then(function(data){
+    console.log(data);
+    console.log(1)
+},function(err){
+    console.log(err);
+    console.log("err")
 })
-p1.then(function(data){
-    throw new Error("出错")
-})
+

@@ -1,4 +1,4 @@
-let myPromise=require("./case.js");
+let myPromise=require("./case1.js");
 let f1=new myPromise(function(resolve,reject){
     reject(100);
     //resolve("success")

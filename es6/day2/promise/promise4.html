@@ -12,6 +12,11 @@
 </html>
 <script>
 //实现链式调用,返回的不是this,而是一个新的promise
+//promise 可以掉用多个then,每次调用then 之后都返回一个新的promise
+//promise then中不管是成功态还是失败态的调用,只要then 返回了一个值,没有报错,(一旦报错就走下个then的失败回调)下个then 都会执行成功态,并把上次的数据返回
+//promise then 中如果返回一个普通值,下个then 就会走成功状态回调,并且把那个值返回
+//如果promise then 中又返回一个promise实例, 下个then 就会走成功状态回调,并且把那个promise实例值返回
+//判断是不是promise对象,如果有promise.then 属性,并且有这个promise.then还是一个函数,就说明是一个promise对象
 function MyPromise(callback){
   let self=this;
   self.status="pending";
@@ -27,7 +32,6 @@ function MyPromise(callback){
            item()
           })
       }
-      
   }
   function reject(rejectValue){
     if(self.status=="pending"){
@@ -37,45 +41,81 @@ function MyPromise(callback){
            item()
           })
     }
-   
   }
-  
   try {
      callback(resolve,reject)
   } catch (error) {
      reject(error)
   }
- 
-
-
+}
+function resolveFn(promise2,x,resolve,reject){
+   if(promise2==x){
+      //有可能这里返回的x是别人的promise
+     return reject(new TypeError("循环引用了")) 
+   }
+   //看x 是不是一个promise,promise 应该是一个对象
+   if((typeof x=="object"||typeof x=="function")&& x!=null){
+      //可能是promise 对象,也可能是函数,如果是promise对象的话,一定有then方法
+      try {
+        let then=x.then;
+        if(typeof then=="function"){
+          then.call(x,function(y){
+            //y有可能还是一个promise
+            resolveFn(promise2,y,resolve,reject)
+          },function(err){
+             reject(err)
+          })
+        }
+      } catch (error) {
+        reject(error)
+      }
+      
+   }else{
+       resolve(x) //说明是一个普通值
+   }
 }
 MyPromise.prototype.then=function(success,err){
   //每次调用
   let self=this;
   let promise2;
   if(self.status=="resolve"){
-    success(self.resolveValue)
+    promise2=new MyPromise(function(resolve,reject){
+      let x=success(self.resolveValue);
+      resolveFn(promise2,x,resolve,reject)
+    })
+   
   }else if(self.status=="reject"){
-    err(self.rejectValue)
+    promise2=new MyPromise(function(resolve,reject){
+      let x=err(self.rejectValue);
+      resolveFn(promise2,x,resolve,reject)
+    })
+   
   }else if(self.status=="pending"){
-    self.successFnArray.push(function(){
-      success(self.resolveValue)
-    });
-    self.errFnArray.push(function(){
-      err(self.rejectValue)
-    });
+    promise2=new MyPromise(function(resolve,reject){
+      self.successFnArray.push(function(){
+        let x= success(self.resolveValue);
+        resolveFn(promise2,x,resolve,reject)
+      });
+      self.errFnArray.push(function(){
+        let x= err(self.rejectValue);
+        resolveFn(promise2,x,resolve,reject)
+      });
+
+    })
   }
+  return promise2
 }
 let f1=new MyPromise(function(resolve,reject){
-    throw new Error("出错")
-    window.setTimeout(function(){ 
-      resolve(100)                
-                                  
-    },1000)
-    
-});
-f1.then(function(data){
+      //resolve(100)  
+      reject("zf")              
+}).then(function(data){
     console.log(data)
+},function(err){
+    
+    console.log("err2"+err)
+    throw new Error("出错")
+}).then(function(data){
+    console.log(200)
 },function(err){
     console.log("err3"+err)
 });

@@ -12,16 +12,23 @@
 </html>
 <script>
     function MyPromise(exctor){
+        let self=this;
+        self.status="pending"//默认等待的状态
+        self.resolveValue=undefined;//成功时默认的值
+        self.rejectValue=undefined;//失败时默认的值
         function resolve(){
             //成功时的函数
+            if(self.status=="pending"){
+                this.tatus="resolve"
+            }
         }
         function reject(){
             //失败时的函数
+            if(self.status=="pending"){
+                this.tatus="reject"
+            }
         }
-        exctor=function (resolve,reject){
-        resolve(100);
-         }
-        exctor()
+         exctor(resolve,reject)
     }
     let f1=new MyPromise(function(resolve,reject){
         resolve(100);
