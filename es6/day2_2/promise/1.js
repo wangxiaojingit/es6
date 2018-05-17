@@ -19,7 +19,7 @@ function MyPromise(excture){
   }  
   function reject(rejectValue){
       if(self.status=="pending"){
-         self.status=reject;
+         self.status="reject";
          self.rejectValue=rejectValue;
          self.resolveArr.forEach(function(item){
             item(self.rejectValue)
