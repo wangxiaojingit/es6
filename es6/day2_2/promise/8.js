@@ -1,17 +1,24 @@
 
 /**
- * Promise 中如何then 中的失败函数不写,可以用catch 进行捕获err,如下面的情况.
- *    let f1=new Promise(function(resolve,reject){
-          reject(100);
-      }).then(function(data){
-          console.log(data)
-      }).catch(function(err){
-          console.log(err)
-      })
- * 
+ * Promise.all
  * 
  */
-
+/*
+ var p1=new Promise(function(resolve,reject){
+     resolve(1)
+})
+var p2=new Promise(function(resolve,reject){
+    reject(2)
+})
+var p3=new Promise(function(resolve,reject){
+    resolve(3)
+})
+Promise.all([p1,p2,p3]).then(function(data){
+      console.log(data)
+    },function(err){
+      console.log(err)
+})
+*/
 
 function MyPromise(excture){
   let self=this;
@@ -40,6 +47,26 @@ function MyPromise(excture){
       }
   }
   excture(resolve,reject)
+}
+//MyPromise 的静态属性all方法
+MyPromise.all=function(promises){
+    let arr=[],index=0;
+   return new MyPromise(function(resolve,reject){
+       for(let i=0;i<promises.length;i++){
+           promises[i].then(function(data){
+              arr[i]=data;
+              index++;
+              if(index==promises.length){
+                 return arr;
+              }
+              
+           },function(err){
+              console.log(err)
+           });
+
+          // promises[i].then(function(data){},reject)
+       }
+   })
 }
 //解析返回值
 function jiexiFn(promise2,x,resolve,reject){
@@ -117,7 +144,7 @@ MyPromise.prototype.then=function(success,err){
     if(self.status=="pending"){
       //如果此时没有成功也没有失败,我们就把then里面传的函数存起来,等他状态转成成功/失败再执行
        promise2=new MyPromise(function(resolve,reject){
-         this.resolveArr.push(function(){
+         self.resolveArr.push(function(){
              try {
                 let x= success();
                 jiexiFn(promise2,x,resolve,reject);
@@ -126,7 +153,7 @@ MyPromise.prototype.then=function(success,err){
              }
             
          });
-         this.rejectArr.push(function(){
+         self.rejectArr.push(function(){
              try {
                 let x= err();
                 jiexiFn(promise2,x,resolve,reject);
@@ -144,20 +171,20 @@ MyPromise.prototype.catch=function(callback){
    return this.then(null,callback);
 }
 let f=new MyPromise(function(resolve,reject){
-    window.setTimeout(function(){
-        reject(100);
-    },1000)
+     resolve(100)
    
 });
-f.then(function(data){
-    console.log(data)
-},function(err){
-    console.log(err)
-})
-;f.then(function(data){
-    console.log(data)
-},function(err){
-    console.log(err)
-})
+let f2=new MyPromise(function(resolve,reject){
+    resolve(100)
+  
+});
+let f3=new MyPromise(function(resolve,reject){
+    resolve(100)
+  
+});
 
-
+MyPromise.all([f,f2,f3]).then(function(data){
+   console.log(data)
+},function(err){
+   console.log(err)
+})

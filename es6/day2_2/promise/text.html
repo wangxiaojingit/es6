@@ -39,9 +39,29 @@
     }
     excture(resolve,reject)
   }
+  //MyPromise 的静态属性all方法
+  MyPromise.all=function(promises){
+      
+     return new MyPromise(function(resolve,reject){
+         let arr=[],index=0;
+         for(let i=0;i<promises.length;i++){
+             promises[i].then(function(y){
+                arr[i]=y;
+                index++;
+                if(index==promises.length){
+                  resolve(arr)
+                }
+                
+             },function(err){console.log(err)});
+  
+            
+         }
+        
+     })
+  }
   //解析返回值
   function jiexiFn(promise2,x,resolve,reject){
-     if(promise2===x){
+     if(promise2==x){
          //promise2 和x 不能相等
          return reject(new TypeError("循环引用"))
      }else if(x!=null&&(typeof x=="object"||typeof x=="function")){
@@ -82,50 +102,95 @@
   MyPromise.prototype.then=function(success,err){
       let self=this;
       let promise2;
+      //如果没有传success函数就默认给它一个函数,并且把上次执行的值返回
+      success=typeof success =="function"?success:(val)=>val;
+      err=typeof err=="function"?err:(err)=>{ throw error}
+      //fangzhi
       if(self.status=="resolve"){
          //说明是成功态
          promise2=new MyPromise(function(resolve,reject){
-            let x= success(self.resolveValue);
-            jiexiFn(promise2,x,resolve,reject);
+            window.setTimeout(function(){
+                try {
+                    let x= success(self.resolveValue);
+                    jiexiFn(promise2,x,resolve,reject);
+                } catch (error) {
+                  reject(error)
+                } 
+            }) 
+            
+            
          })
          
       }
       if(self.status=="reject"){
         //说明是失败态
         promise2=new MyPromise(function(resolve,reject){
-          let x=err(self.rejectValue);
-          jiexiFn(promise2,x,resolve,reject);
+            window.setTimeout(function(){
+                try {
+                    let x=err(self.rejectValue);
+                    jiexiFn(promise2,x,resolve,reject);
+                } catch (error) {
+                    reject(error) 
+                }
+            })
+           
+          
         })
        
       }
       if(self.status=="pending"){
         //如果此时没有成功也没有失败,我们就把then里面传的函数存起来,等他状态转成成功/失败再执行
          promise2=new MyPromise(function(resolve,reject){
-           this.resolveArr.push(function(){
-              let x= success();
-              jiexiFn(promise2,x,resolve,reject);
+           self.resolveArr.push(function(){
+               window.setTimeout(function(){
+                try {
+                    let x= success();
+                    jiexiFn(promise2,x,resolve,reject);
+                } catch (error) {
+                    reject(error) 
+                }
+               })
            });
-           this.rejectArr.push(function(){
-              let x= err();
-              jiexiFn(promise2,x,resolve,reject);
+           self.rejectArr.push(function(){
+               window.setTimeout(function(){
+                  try {
+                        let x= err();
+                        jiexiFn(promise2,x,resolve,reject);
+                   } catch (error) {
+                        reject(error) 
+                   }
+
+               })
+              
            });
          })
         
       }
-      return promise2
+      return promise2;
   }
-  
+   //增加catch 方法
+  MyPromise.prototype.catch=function(callback){
+     return this.then(null,callback);
+  }
   let f=new MyPromise(function(resolve,reject){
-        resolve(100)
-  }).then(function(data){
-     console.log(data);
-  },function(err){
-     console.log(err);
-  }).then(function(data){
+       resolve(100)
+     
+  });
+  let f2=new MyPromise(function(resolve,reject){
+      resolve(200)
+    
+  });
+  let f3=new MyPromise(function(resolve,reject){
+      resolve(100)
+    
+  });
+  
+  MyPromise.all([f,f2,f3]).then(function(data){
      console.log(data)
   },function(err){
      console.log(err)
   })
+  //console.log(MyPromise.all([f,f2,f3]))
 </script>
 
    
