@@ -1,12 +1,13 @@
 
 /**
- * Promise 值的穿透
- * let f1=new Promise(function(resolve,reject){
- *     resolve(100)
- * }).then().then().then(function(data){
- * },function(data){
- * 
- * })
+ * Promise 中如何then 中的失败函数不写,可以用catch 进行捕获err,如下面的情况.
+ *    let f1=new Promise(function(resolve,reject){
+          reject(100);
+      }).then(function(data){
+          console.log(data)
+      }).catch(function(err){
+          console.log(err)
+      })
  * 
  * 
  */
@@ -90,16 +91,26 @@ MyPromise.prototype.then=function(success,err){
     if(self.status=="resolve"){
        //说明是成功态
        promise2=new MyPromise(function(resolve,reject){
-          let x= success(self.resolveValue);
-          jiexiFn(promise2,x,resolve,reject);
+          try {
+            let x= success(self.resolveValue);
+            jiexiFn(promise2,x,resolve,reject);
+          } catch (error) {
+              reject(error)
+          } 
+          
        })
        
     }
     if(self.status=="reject"){
       //说明是失败态
       promise2=new MyPromise(function(resolve,reject){
-        let x=err(self.rejectValue);
-        jiexiFn(promise2,x,resolve,reject);
+          try {
+            let x=err(self.rejectValue);
+            jiexiFn(promise2,x,resolve,reject);
+          } catch (error) {
+             reject(error) 
+          }
+        
       })
      
     }
@@ -107,12 +118,22 @@ MyPromise.prototype.then=function(success,err){
       //如果此时没有成功也没有失败,我们就把then里面传的函数存起来,等他状态转成成功/失败再执行
        promise2=new MyPromise(function(resolve,reject){
          this.resolveArr.push(function(){
-            let x= success();
-            jiexiFn(promise2,x,resolve,reject);
+             try {
+                let x= success();
+                jiexiFn(promise2,x,resolve,reject);
+             } catch (error) {
+                reject(error) 
+             }
+            
          });
          this.rejectArr.push(function(){
-            let x= err();
-            jiexiFn(promise2,x,resolve,reject);
+             try {
+                let x= err();
+                jiexiFn(promise2,x,resolve,reject);
+             } catch (error) {
+                reject(error) 
+             }
+            
          });
        })
       
