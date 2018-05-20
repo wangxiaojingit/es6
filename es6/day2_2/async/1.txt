@@ -1,0 +1,1 @@
+./ES6/day2_2/async/2.txt

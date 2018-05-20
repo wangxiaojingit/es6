@@ -1,6 +1,8 @@
 
 /**
- * Promise.all
+ * Promise.resolve(value)//一上来就执行成功
+ * Promise.reject(value)//一上来就执行失败
+ * 
  * 
  */
 /*
@@ -64,6 +66,23 @@ MyPromise.all=function(promises){
 
           // promises[i].then(function(data){},reject)
        }
+   })
+}
+MyPromise.race=function(promises){
+   return new MyPromise(function(resolve,reject){
+       for(let i=0;i<promises.length;i++){
+            promises[i].then(resolve,reject)
+       }
+   })
+}
+MyPromise.resolve=function(value){
+   return new MyPromise(function(resolve,reject){
+          resolve(valule)
+   })
+}
+MyPromise.reject=function(value){
+   return new  MyPromise(function(resolve,reject){
+          reject(value)
    })
 }
 //解析返回值
@@ -181,7 +200,7 @@ let f3=new MyPromise(function(resolve,reject){
   
 });
 
-MyPromise.all([f,f2,f3]).then(function(data){
+MyPromise.race([f,f2,f3]).then(function(data){
    console.log(data)
 },function(err){
    console.log(err)

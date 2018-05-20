@@ -1,6 +1,7 @@
 
 /**
- * Promise.all
+ * Promise.race([a,b]);
+ * 数组中只要一个promise执行成功就算成功，一个失败就算失败
  * 
  */
 /*
@@ -63,6 +64,13 @@ MyPromise.all=function(promises){
            },reject);
 
           // promises[i].then(function(data){},reject)
+       }
+   })
+}
+MyPromise.race=function(promises){
+   return new MyPromise(function(resolve,reject){
+       for(let i=0;i<promises.length;i++){
+            promises[i].then(resolve,reject)
        }
    })
 }
@@ -181,7 +189,7 @@ let f3=new MyPromise(function(resolve,reject){
   
 });
 
-MyPromise.all([f,f2,f3]).then(function(data){
+MyPromise.race([f,f2,f3]).then(function(data){
    console.log(data)
 },function(err){
    console.log(err)
